@@ -10,6 +10,7 @@ import {  selectLoggedInUser } from '../features/auth/authSlice';
 import { createOrderAsync, selectCurrentOrder } from '../features/order/orderSlice';
 import { updateUserAsync } from '../features/auth/authSlice';
 
+import { discountedPrice } from '../app/constants';
     //TODO : WE will add the payment method later on backend
 
 
@@ -335,9 +336,7 @@ const CheckoutPage = () => {
                               <a href={item.images[0]}>{item.title}</a>
                             </h3>
                             <div>
-                              <p className="ml-4">${Math.round(
-                                item.price * (1 - item.discountPercentage / 100)
-                              )}</p>
+                              <p className="ml-4">${discountedPrice(item)}</p>
 
                               <p className="ml-4 line-through text-gray-400">${item.price}</p>
                             </div>
