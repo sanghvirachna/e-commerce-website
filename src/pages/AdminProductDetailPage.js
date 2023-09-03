@@ -1,15 +1,13 @@
-import React from 'react'
-import Navbar from '../features/navbar/Navbar'
-import AdminProductDetails from '../features/admin/AdminProductDetails'
-
-const AdminProductDetailPage = () => {
-  return (
-    <div>
-      <Navbar>
-        <AdminProductDetails></AdminProductDetails>
-      </Navbar>
-    </div>
-  )
+import AdminProductDetail from "../features/admin/components/AdminProductDetail";
+import NavBar from "../features/navbar/Navbar";
+function AdminProductDetailPage() {
+    return ( 
+        <div>
+            <NavBar>
+                <AdminProductDetail></AdminProductDetail>
+            </NavBar>
+        </div>
+     );
 }
 
-export default AdminProductDetailPage
+export default AdminProductDetailPage;

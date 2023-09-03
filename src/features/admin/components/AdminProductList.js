@@ -1,23 +1,36 @@
 import React, { useState, Fragment, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  selectAllProducts, fetchAllProductsAsync, fetchProductsByFiltersAsync, selectTotalItems, selectBrands, selectCategories, fetchBrandsAsync, fetchCategoriesAsync
-} from './productListSlice';
-import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon, StarIcon } from '@heroicons/react/20/solid'
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import { Link } from 'react-router-dom'
-import { ITEM_PER_PAGE, discountedPrice } from '../../app/constants';
-
-
+  fetchBrandsAsync,
+  fetchCategoriesAsync,
+  fetchProductsByFiltersAsync,
+  selectAllProducts,
+  selectBrands,
+  selectCategories,
+  selectTotalItems,
+} from '../../product/productSlice';
+import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  StarIcon,
+} from '@heroicons/react/20/solid';
+import { Link } from 'react-router-dom';
+import {
+  ChevronDownIcon,
+  FunnelIcon,
+  MinusIcon,
+  PlusIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/20/solid';
+import { ITEMS_PER_PAGE, discountedPrice } from '../../../app/constants';
 
 const sortOptions = [
   { name: 'Best Rating', sort: 'rating', order: 'desc', current: false },
   { name: 'Price: Low to High', sort: 'price', order: 'asc', current: false },
   { name: 'Price: High to Low', sort: 'price', order: 'desc', current: false },
 ];
-
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -28,40 +41,42 @@ export default function AdminProductList() {
   const products = useSelector(selectAllProducts);
   const brands = useSelector(selectBrands);
   const categories = useSelector(selectCategories);
-  const [filter, setFilter] = useState({});
-  const [sort, setSort] = useState({});
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [page, setPage] = useState(1);
+  const totalItems = useSelector(selectTotalItems);
   const filters = [
     {
       id: 'category',
       name: 'Category',
-      options: categories
+      options: categories,
     },
     {
       id: 'brand',
       name: 'Brands',
-      options: brands
+      options: brands,
     },
   ];
 
-
-
+  const [filter, setFilter] = useState({});
+  const [sort, setSort] = useState({});
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [page, setPage] = useState(1);
   const handleFilter = (e, section, option) => {
-    console.log(e.target.checked)
+    console.log(e.target.checked);
     const newFilter = { ...filter };
     // TODO : on server it will support multiple categories
     if (e.target.checked) {
       if (newFilter[section.id]) {
-        newFilter[section.id].push(option.value)
+        newFilter[section.id].push(option.value);
       } else {
-        newFilter[section.id] = [option.value]
+        newFilter[section.id] = [option.value];
       }
     } else {
-      const index = newFilter[section.id].findIndex(el => el === option.value)
+      const index = newFilter[section.id].findIndex(
+        (el) => el === option.value
+      );
       newFilter[section.id].splice(index, 1);
     }
     console.log({ newFilter });
+
     setFilter(newFilter);
   };
 
@@ -70,26 +85,26 @@ export default function AdminProductList() {
     console.log({ sort });
     setSort(sort);
   };
+
   const handlePage = (page) => {
+    console.log({ page });
     setPage(page);
-  }
+  };
 
-  const totalItems = useSelector(selectTotalItems)
   useEffect(() => {
-    const pagination = { _page: page, _limit: ITEM_PER_PAGE };
-    dispatch(fetchProductsByFiltersAsync({ filter, sort, pagination }));
-
+    const pagination = { _page: page, _limit: ITEMS_PER_PAGE };
+    dispatch(fetchProductsByFiltersAsync({ filter, sort, pagination, admin:true }));
   }, [dispatch, filter, sort, page]);
 
   useEffect(() => {
-    setPage(1)
-  }, [totalItems, sort])
+    setPage(1);
+  }, [totalItems, sort]);
 
   useEffect(() => {
     dispatch(fetchBrandsAsync());
     dispatch(fetchCategoriesAsync());
+  }, []);
 
-  }, [])
   return (
     <div className="bg-white">
       <div>
@@ -176,17 +191,21 @@ export default function AdminProductList() {
             </h2>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
-              <DesktopFilter handleFilter={handleFilter} filters={filters}></DesktopFilter>
+              <DesktopFilter
+                handleFilter={handleFilter}
+                filters={filters}
+              ></DesktopFilter>
               {/* Product grid */}
+
               <div className="lg:col-span-3">
-                <div className='ml-8'>
-                  <Link to="/admin/product-form" className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                <div>
+                  <Link
+                    to="/admin/product-form"
+                    className="rounded-md mx-10 my-5 bg-green-700 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
                     Add New Product
                   </Link>
-
                 </div>
-
                 <ProductGrid products={products}></ProductGrid>
               </div>
               {/* Product grid end */}
@@ -194,7 +213,12 @@ export default function AdminProductList() {
           </section>
 
           {/* section of product and filters ends */}
-          <Pagination page={page} setPage={setPage} handlePage={handlePage} totalItems={totalItems}></Pagination>
+          <Pagination
+            page={page}
+            setPage={setPage}
+            handlePage={handlePage}
+            totalItems={totalItems}
+          ></Pagination>
         </main>
       </div>
     </div>
@@ -205,7 +229,7 @@ function MobileFilter({
   mobileFiltersOpen,
   setMobileFiltersOpen,
   handleFilter,
-  filters
+  filters,
 }) {
   return (
     <Transition.Root show={mobileFiltersOpen} as={Fragment}>
@@ -377,20 +401,18 @@ function DesktopFilter({ handleFilter, filters }) {
 }
 
 function Pagination({ page, setPage, handlePage, totalItems }) {
-  const totalPages = Math.ceil(totalItems / ITEM_PER_PAGE)
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
   return (
     <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
       <div className="flex flex-1 justify-between sm:hidden">
         <div
-          onClick={(e) => handlePage(page > 1 ? page - 1 : totalPages)}
-
+          onClick={(e) => handlePage(page > 1 ? page - 1 : page)}
           className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Previous
         </div>
         <div
-          onClick={(e) => handlePage(page < totalPages ? page + 1 : 1)}
-
+          onClick={(e) => handlePage(page < totalPages ? page + 1 : page)}
           className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Next
@@ -399,9 +421,17 @@ function Pagination({ page, setPage, handlePage, totalItems }) {
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
-            Showing <span className="font-medium">{(page - 1) * ITEM_PER_PAGE + 1}</span> to{' '}
-            <span className="font-medium">{page * ITEM_PER_PAGE > totalItems ? totalItems : page * ITEM_PER_PAGE}</span> of{' '}
-            <span className="font-medium">{totalItems}</span> results
+            Showing{' '}
+            <span className="font-medium">
+              {(page - 1) * ITEMS_PER_PAGE + 1}
+            </span>{' '}
+            to{' '}
+            <span className="font-medium">
+              {page * ITEMS_PER_PAGE > totalItems
+                ? totalItems
+                : page * ITEMS_PER_PAGE}
+            </span>{' '}
+            of <span className="font-medium">{totalItems}</span> results
           </p>
         </div>
         <div>
@@ -410,26 +440,31 @@ function Pagination({ page, setPage, handlePage, totalItems }) {
             aria-label="Pagination"
           >
             <div
-              onClick={(e) => handlePage(page > 1 ? page - 1 : totalPages)}
+              onClick={(e) => handlePage(page > 1 ? page - 1 : page)}
               className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
             >
               <span className="sr-only">Previous</span>
               <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
             </div>
             {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
-            {Array.from({ length: totalPages }).map((el, index) =>
+
+            {Array.from({ length: totalPages }).map((el, index) => (
               <div
+                key={index}
                 onClick={(e) => handlePage(index + 1)}
                 aria-current="page"
-                className={`relative z-10 cursor-pointer inline-flex items-center ${index + 1 === page ? 'bg-indigo-600 text-white' : 'text-indigo-400 bg-white'} px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                className={`relative cursor-pointer z-10 inline-flex items-center ${
+                  index + 1 === page
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-gray-400'
+                } px-4 py-2 text-sm font-semibold  focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
               >
                 {index + 1}
               </div>
-            )
+            ))}
 
-            }
             <div
-              onClick={(e) => handlePage(page < totalPages ? page + 1 : 1)}
+              onClick={(e) => handlePage(page < totalPages ? page + 1 : page)}
               className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
             >
               <span className="sr-only">Next</span>
@@ -448,8 +483,8 @@ function ProductGrid({ products }) {
       <div className="mx-auto max-w-2xl px-4 py-0 sm:px-6 sm:py-0 lg:max-w-7xl lg:px-8">
         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
           {products.map((product) => (
-            <div>
-              <Link to={`/product-details/${product.id}`} key={product.id}>
+            <div key={product.id}>
+              <Link to={`/product-detail/${product.id}`} >
                 <div className="group relative border-solid border-2 p-2 border-gray-200">
                   <div className="min-h-60 aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-60">
                     <img
@@ -462,7 +497,10 @@ function ProductGrid({ products }) {
                     <div>
                       <h3 className="text-sm text-gray-700">
                         <div href={product.thumbnail}>
-                          <span aria-hidden="true" className="absolute inset-0" />
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-0"
+                          />
                           {product.title}
                         </div>
                       </h3>
@@ -473,26 +511,34 @@ function ProductGrid({ products }) {
                     </div>
                     <div>
                       <p className="text-sm block font-medium text-gray-900">
-                        ${discountedPrice(product)}
+                        $
+                        {discountedPrice(product)}
                       </p>
                       <p className="text-sm block line-through font-medium text-gray-400">
                         ${product.price}
                       </p>
                     </div>
                   </div>
+                  {product.deleted && (
+                    <div>
+                      <p className="text-sm text-red-400">product deleted</p>
+                    </div>
+                  )}
+                  {product.stock<=0 && (
                   <div>
-                    {product.deleted && <p className='text-sm text-red-400 text-center'>product deleted</p>}
+                    <p className="text-sm text-red-400">out of stock</p>
                   </div>
-
+                )}
                 </div>
               </Link>
-              <div className="mt-5 text-center">
-                <Link  to={`/admin/product-form/edit/${product.id}`} className="text-sm font-semibold leading-6 mt-5 mb-3 underline text-gray-900">
+              <div className="mt-5">
+                <Link
+                  to={`/admin/product-form/edit/${product.id}`}
+                  className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
                   Edit Product
-                </Link >
-
+                </Link>
               </div>
-
             </div>
           ))}
         </div>

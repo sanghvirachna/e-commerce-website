@@ -1,5 +1,4 @@
-// A mock function to mimic making an async request for data
-export function addtoCart(item) {
+export function addToCart(item) {
   return new Promise(async (resolve) => {
     const response = await fetch('http://localhost:8080/cart', {
       method: 'POST',
@@ -11,15 +10,16 @@ export function addtoCart(item) {
     resolve({ data });
   });
 }
-export function fetchItemsByUserId(userId) {
+
+export function fetchItemsByUserId() {
   return new Promise(async (resolve) => {
     //TODO: we will not hard-code server URL here
-    const response = await fetch('http://localhost:8080/cart?user=' + userId)
-    const data = await response.json()
-    resolve({ data })
-  }
-  );
+    const response = await fetch('http://localhost:8080/cart');
+    const data = await response.json();
+    resolve({ data });
+  });
 }
+
 export function updateCart(update) {
   return new Promise(async (resolve) => {
     const response = await fetch('http://localhost:8080/cart/' + update.id, {
@@ -32,7 +32,8 @@ export function updateCart(update) {
     resolve({ data });
   });
 }
-export function deleteItemfromCart(itemId) {
+
+export function deleteItemFromCart(itemId) {
   return new Promise(async (resolve) => {
     const response = await fetch('http://localhost:8080/cart/' + itemId, {
       method: 'DELETE',
@@ -43,16 +44,15 @@ export function deleteItemfromCart(itemId) {
     resolve({ data: { id: itemId } });
   });
 }
-export function resetCart(userId) {
-  //get all items and then delete them one by one
+
+export function resetCart() {
+  // get all items of user's cart - and then delete each
   return new Promise(async (resolve) => {
-    const response = await fetchItemsByUserId(userId);
+    const response = await fetchItemsByUserId();
     const items = response.data;
     for (let item of items) {
-      await deleteItemfromCart(item.id);
+      await deleteItemFromCart(item.id);
     }
-    resolve({status:'success'})
+    resolve({ status: 'success' });
   });
 }
-
-
