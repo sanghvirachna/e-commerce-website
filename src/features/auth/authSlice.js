@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { checkUser, createUser, signOut } from './authAPI';
-import { updateUser ,checkAuth} from '../auth/authAPI';
+import {  checkAuth} from '../auth/authAPI';
 
 const initialState = {
   loggedInUser: null, // this should only contain user identity => 'id'/'role'

@@ -20,7 +20,6 @@ function ProductForm() {
     handleSubmit,
     setValue,
     reset,
-    formState: { errors },
   } = useForm();
   const brands = useSelector(selectBrands);
   const categories = useSelector(selectCategories);
