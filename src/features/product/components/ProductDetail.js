@@ -38,7 +38,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
-// TODO : Loading UI
+
 
 export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState(colors[0]);
